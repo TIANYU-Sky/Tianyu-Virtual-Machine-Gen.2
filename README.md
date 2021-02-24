@@ -1,62 +1,13 @@
 # Tianyu-Virtual-Machine-Gen.2
 
 # 目录
-> [虚拟机的基本构成](#First)
+> **[虚拟机的基本构成](#First)**
 >> [虚拟内存](#First-1)  
 >> [虚拟处理器](#First-2)  
 >> [虚拟系统](#First-3)  
 >> [虚拟输入输出控制器](#First-4)  
 >> [虚拟设备](#First-5)  
   
-&emsp;  
-
-&emsp;  
-&emsp;  
-&emsp;  
-&emsp;  
-&emsp;  
-&emsp;  
-&emsp;  
-&emsp;  
-&emsp;  
-&emsp;  
-&emsp;  
-&emsp;  
-&emsp;  
-&emsp;  
-&emsp;  
-&emsp;  
-&emsp;  
-&emsp;  
-&emsp;  
-&emsp;  
-&emsp;  
-&emsp;  
-&emsp;  
-&emsp;  
-&emsp;  
-&emsp;  
-&emsp;  
-&emsp;  
-&emsp;  
-&emsp;  
-&emsp;  
-&emsp;  
-&emsp;  
-&emsp;  
-&emsp;  
-&emsp;  
-&emsp;  
-&emsp;  
-&emsp;  
-&emsp;  
-&emsp;  
-&emsp;  
-&emsp;  
-&emsp;  
-&emsp;  
-&emsp;  
-
 ## <span id="First">虚拟机的基本构成</span>
 ### <span id="First-1">虚拟内存</span>
 ### <span id="First-2">虚拟处理器</span>
