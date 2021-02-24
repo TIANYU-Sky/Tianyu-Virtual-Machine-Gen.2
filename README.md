@@ -85,10 +85,10 @@
 ![天宇虚拟机逻辑结构-(READMEIMG/TYVMGen.2-LogicStruct.png)](https://github.com/TIANYU-Sky/Tianyu-Virtual-Machine-Gen.2/blob/main/READMEIMG/TYVMGen.2-LogicStruct.png)
 ### <span id="Third-2">**基本设计**</span>
 > 虚拟处理器  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;如下图所示，虚拟机的处理器模拟现在的通用处理器设计，包含基本的<kbd>算术逻辑单元</kbd>、<kbd>浮点运算单元</kbd>、<kbd>寄存器</kbd>和<kbd>控制器</kbd>。其中段寄存器用于相对寻址的实现，专用寄存器则作为堆栈、源/目的地址等的寻址，通用寄存器用于临时保存数据；算术逻辑单元用于执行逻辑指令与算数指令，浮点运算单元用于执行独立的浮点指令；指令指针始终指向下一条需要执行的指令位置；<kbd>标志寄存器</kbd>用于保存指令执行完成后符号、奇偶性等附加数据的值。
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;如下图所示，虚拟机的处理器模拟现在的通用处理器设计，包含基本的<kbd>算术逻辑单元</kbd>、<kbd>浮点运算单元</kbd>、<kbd>寄存器</kbd>和<kbd>控制器</kbd>。其中段寄存器用于相对寻址的实现，专用寄存器则作为堆栈、源/目的地址等的寻址，通用寄存器用于临时保存数据；算术逻辑单元用于执行逻辑指令与算数指令，浮点运算单元用于执行独立的浮点指令；指令指针始终指向下一条需要执行的指令位置；<kbd>标志寄存器</kbd>用于保存指令执行完成后符号、奇偶性等附加数据的值。  
 ![天宇虚拟机虚拟处理器基本设计-(READMEIMG/TYVMGen.2-BaseDesign-CPU.png)](https://github.com/TIANYU-Sky/Tianyu-Virtual-Machine-Gen.2/blob/main/READMEIMG/TYVMGen.2-BaseDesign-CPU.png)  
 &emsp;  
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;虚拟处理器的<kbd>执行控制器</kbd>是处理器的控制单元，主要用于指令的译码和执行，在执行中出现的指令错误也将通过系统通道进行报告。天宇虚拟机指令集借用x86指令集，提供与其类似的指令系统，如下表展示了所有天宇虚拟机现有**指令集**的所有指令；由于篇幅原因，具体的指令编码见[指令集编码](#Seventh)。  
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;虚拟处理器的<kbd>执行控制器</kbd>是处理器的控制单元，主要用于指令的译码和执行，在执行中出现的指令错误也将通过系统通道进行报告。天宇虚拟机指令集借用x86指令集，提供与其类似的指令系统，如下表展示了所有天宇虚拟机现有**指令集**的所有指令；由于篇幅原因，具体的指令编码见[指令集编码](#Sixth)。  
 > 
 > |指令助记符|翻译代码|说明|
 > |:-:|:-:|:--|
@@ -261,7 +261,7 @@
 > |\_\_TYVM_IO_DEVICE_STATE_STOPED\_\_|0x02|设备已经停止运行|
 > |\_\_TYVM_IO_DEVICE_STATE_PAUSED\_\_|0x03|设备暂停（未停止运行）|
 > |\_\_TYVM_IO_DEVICE_STATE_ERROR\_\_|0xFF|设备存在错误|
-
+> 
 > *注：天宇虚拟机虚拟设备状态宏定义在头文件（tvmio.h）中定义。*  
 
 &emsp;  
@@ -284,7 +284,6 @@
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;在虚拟CPU中虽然提供了段寄存器的设计，但由于在实际的x64运行时，为了保证寻址空间，默认并**不采用基于段寄存器的寻址**。因此在虚拟机运行过程中也保留了这个设定，段寄存器的值默认为0。对于**数据的寻址**，则依旧**可以使用段寄存器**进行基于段的寻址。需要注意的是，虽然段寄存器默认不适用，但当指令对**CS段进行修改后**，依旧**会影响下一条指令的位置**，因此在指令设计中，应**避免对CS段寄存器进行赋值操作**，以免影响指令执行时的安全性，也避免出现不可控的跳转。  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;虚拟CPU中的<kbd>栈顶</kbd>与<kbd>栈底</kbd>字段用于进行**栈地址的安全性检查**，可以为栈指针的验证提供根据。在执行时如遇到需要对堆栈指针进行操作的指令，**处理器**将会先**对栈指针进行安全性验证**，如果验证**失败**，则将**自动向虚拟系统抛出异常**并**结束掉该线程**，**保证**内存的**安全性**。  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;CPU中还包含了一个用于计算内存位置的函数，通过该函数，CPU可以实时的根据指令，计算相对寻址的目标地址。  
-
 &emsp;   
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;每一个虚拟CPU在执行时都需要绑定一个实际的系统线程，因此在运行时，将会通过系统线程调用处理器执行方法实现运行。在处理器执行方法中，将会获取下一跳指令，并完成译码工作。译码完成后的指令将被组装成一个指令包，<b>指令包类结构（C语言）</b>如下图所示，并**通过指令包中的Run方法**实现指令的**执行**。对于**不同的指令**，指令包中的**Run方法将绑定到不同的实例**。  
 ![天宇虚拟机执行指令包类图（C语言）-(READMEIMG/TYVMGen.2-Realize-InstructionPackage.png)](https://github.com/TIANYU-Sky/Tianyu-Virtual-Machine-Gen.2/blob/main/READMEIMG/TYVMGen.2-Realize-InstructionPackage.png)   
@@ -309,6 +308,7 @@
 |\_\_TYVM_RUNNING_EXCEPTION_CPU_INSTRUCTION_ERROR\_\_|0x02|指令执行异常|
 |\_\_TYVM_RUNNING_EXCEPTION_OVERFLOW_STACK\_\_|0x10|堆栈越界|
 |\_\_TYVM_RUNNING_EXCEPTION_NULL_POINTER\_\_|0x11|空指针异常|  
+
 *注：天宇虚拟机系统组件的异常定义在（tvmsystem.h）中。*  
 
 &emsp;  
@@ -444,7 +444,7 @@
 > |0xD|16|1操作数指令|
 > |0xE|16|1操作数指令（2字节长度）|
 > |0xF|15|1操作数指令（2字节长度）|
-
+> 
 > &emsp;  
 > &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;其中0操作数指令总计31条，1操作数指令总计95条（64条1字节指令和31条2字节指令），2操作数指令总计48条。
 
@@ -463,7 +463,6 @@
 > |0b10|立即数寻址|
 > |0b11|立即数（不存在第二操作数，忽略附加段1的低2位）| 
 >   
-> &emsp;  
 > &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;中间的四位为寄存器/扩展码标识，用于描述对应的寄存器或立即数的长度，详细的**附加段1寄存器扩展码**见下表。
 > &emsp; 
 > |寻址方式|寄存器/拓展码|说明|
@@ -476,7 +475,6 @@
 > ||0100|指定的立即数长度为双字|
 > ||1000|指定的立即数长度为四字|
 >   
-> &emsp;  
 > &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;低2位为副操作数（第2操作数）的类型标识符，具体的**附加段1副操作数编码**见下表。
 > &emsp; 
 > |编码|说明|
